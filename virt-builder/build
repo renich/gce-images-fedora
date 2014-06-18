@@ -49,6 +49,7 @@ gs='fedora-images'
 
 function ask_continue
 {
+    # skip for now
     return
     shopt -s extglob
 
