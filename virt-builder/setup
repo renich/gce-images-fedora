@@ -153,5 +153,8 @@ kernel.yama.ptrace_scope=1
 kernel.perf_event_paranoid=2
 EOF
 
+# google things
+# todo:
+#   * google-daemon depends on syslog.service; which does not exist in fedora
 
 exit 0
