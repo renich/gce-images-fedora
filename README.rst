@@ -5,7 +5,7 @@ Description
 -----------
 Tools to roll your own Fedora image for Google Compute Engine.
 
-Currently, I will be using 2 methods for building the images.
+Currently, I will be using 2 methods for building the images:
 
 virt-builder
     Because it just works and it works great.
