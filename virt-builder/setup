@@ -40,7 +40,45 @@ systemctl disable iptables.service
 sed -ri 's@apply_updates = no@apply_updates = yes@' /etc/yum/yum-cron.conf
 
 # ssh config
-# todo
+## delete the keys
+rm /etc/ssh/ssh_host_key
+rm /etc/ssh/ssh_host_rsa_key*
+rm /etc/ssh/ssh_host_dsa_key*
+rm /etc/ssh/ssh_host_ecdsa_key*
+
+## patch sshd_config
+patch sshd_config.test < <( cat << 'EOF'
+18,19c18,19
+< #AddressFamily any
+< #ListenAddress 0.0.0.0
+---
+> AddressFamily inet
+> ListenAddress 0.0.0.0
+48c48
+< #PermitRootLogin yes
+---
+> PermitRootLogin without-password
+78c78
+< PasswordAuthentication yes
+---
+> PasswordAuthentication yes
+114c114
+< #AllowTcpForwarding yes
+---
+> AllowTcpForwarding no
+127c127
+< #ClientAliveInterval 0
+---
+> ClientAliveInterval 420
+133c133
+< #PermitTunnel no
+---
+> PermitTunnel no
+EOF
+)
+
+## lock root
+# usermod -L root
 
 # kernel
 ## remove symbol table
