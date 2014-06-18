@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# WARNING!
+# Please, do not run this script by it's own. It can destroy some of your configuration.
+# This script is a setup script for the guest we're creating.
+
 # hosts
 cat << 'EOF' > /etc/hosts
 127.0.0.1 localhost
