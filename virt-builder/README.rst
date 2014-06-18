@@ -5,15 +5,15 @@ This project rocks and it's an easy way to edit a guest and use it.
 Requirements
 ------------
 * libguestfs-tools-c
-* libs-xz (for the parallel implementation of xzcat to work)
+* xz-libs (for the parallel implementation of xzcat to work)
 
 Installation
 ------------
 
 ::
 
-    yum install libguestfs-tools-c libs-xz
-    dnf install libguestfs-tools-c libs-xz
+    yum install libguestfs-tools-c xz-libs
+    dnf install libguestfs-tools-c xz-libs
 
 Start to build
 --------------
