@@ -9,6 +9,9 @@ Requirements
 
 Installation
 ------------
+
+::
+
     yum install libguestfs-tools-c libs-xz
     dnf install libguestfs-tools-c libs-xz
 
@@ -16,12 +19,13 @@ Start to build
 --------------
 # First, setup an account at: https://console.developers.google.com
 
-# Create a Project and configure billing for it. You can get a coupon here: 
-  https://cloud.google.com/developers/starterpack/
+# Create a Project and configure billing for it. You can get a coupon here: https://cloud.google.com/developers/starterpack/
 
 # Create a Google Storage bucket. 
 
 # Then, you need to install the Google Cloud SDK:
+
+::
 
     # setup google cloud sdk
     curl https://sdk.cloud.google.com | bash
@@ -37,13 +41,19 @@ Start to build
 
 # Now, set your project
 
+::
+
     gcloud config set project <my-existing-project>
 
 # Configure the image builder. Don't forget to update the gs variable (google storage)
 
+::
+
     vim ./build
 
 # Build the image.
+
+::
 
     ./build
 
