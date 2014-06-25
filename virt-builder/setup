@@ -45,7 +45,7 @@ rm /etc/ssh/ssh_host_dsa_key*
 rm /etc/ssh/ssh_host_ecdsa_key*
 
 ## patch sshd_config
-patch sshd_config.test < <( cat << 'EOF'
+patch /etc/ssh/sshd_config < <( cat << 'EOF'
 18,19c18,19
 < #AddressFamily any
 < #ListenAddress 0.0.0.0
