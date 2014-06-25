@@ -36,8 +36,9 @@ DEVICE="eth0"
 NAME="eth0"
 ONBOOT="yes"
 BOOTPROTO="dhcp"
-IPV4_FAILURE_FATAL="yes"
 DEFROUTE="yes"
+IPV4_FAILURE_FATAL="yes"
+IPV6INIT="no"
         </file>
 
         <file name='/etc/sysctl.d/11-google-strongly_recommended.conf'>
