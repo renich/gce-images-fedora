@@ -5,7 +5,7 @@
         <version>20</version>
         <arch>x86_64</arch>
         <install type='url'>
-            <url>http://dl.fedoraproject.org/pub/fedora/linux/releases/20/Fedora/x86_64/os/</url>
+            <url>https://dl.fedoraproject.org/pub/fedora/linux/releases/20/Fedora/x86_64/os/</url>
         </install>
         <rootpw>fedora</rootpw>
     </os>
@@ -107,76 +107,116 @@ kernel.yama.ptrace_scope=1
 # set perf only available to root
 kernel.perf_event_paranoid=2
         </file>
+
+        <file name='/google-ssh_fix.patch'>
+--- sshd_config.orig    2014-07-07 19:33:39.191177345 -0500
++++ sshd_config 2014-07-07 19:33:45.847163518 -0500
+@@ -15,8 +15,8 @@
+ # semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
+ #
+ #Port 22
+-#AddressFamily any
+-#ListenAddress 0.0.0.0
++AddressFamily inet
++ListenAddress 0.0.0.0
+ #ListenAddress ::
+ 
+ # The default requires explicit activation of protocol 1
+@@ -45,7 +45,7 @@
+ # Authentication:
+ 
+ #LoginGraceTime 2m
+-#PermitRootLogin yes
++PermitRootLogin without-password
+ #StrictModes yes
+ #MaxAuthTries 6
+ #MaxSessions 10
+@@ -75,7 +75,7 @@
+ # To disable tunneled clear text passwords, change to no here!
+ #PasswordAuthentication yes
+ #PermitEmptyPasswords no
+-PasswordAuthentication yes
++PasswordAuthentication no
+ 
+ # Change to no to disable s/key passwords
+ #ChallengeResponseAuthentication yes
+@@ -111,10 +111,10 @@
+ UsePAM yes
+ 
+ #AllowAgentForwarding yes
+-#AllowTcpForwarding yes
++AllowTcpForwarding no
+ #GatewayPorts no
+ #X11Forwarding no
+-X11Forwarding yes
++X11Forwarding no
+ #X11DisplayOffset 10
+ #X11UseLocalhost yes
+ #PrintMotd yes
+@@ -124,13 +124,13 @@
+ UsePrivilegeSeparation sandbox     # Default for new installations.
+ #PermitUserEnvironment no
+ #Compression delayed
+-#ClientAliveInterval 0
++ClientAliveInterval 420
+ #ClientAliveCountMax 3
+ #ShowPatchLevel no
+ #UseDNS yes
+ #PidFile /var/run/sshd.pid
+ #MaxStartups 10:30:100
+-#PermitTunnel no
++PermitTunnel no
+ #ChrootDirectory none
+ #VersionAddendum none
+ 
+# end
+        </file>
     </files>
 
     <commands>
+        <command name='upgrade'>
+            yum -y upgrade
+            #yum clean all
+            while read f; do mv -f $f ${f%%.rpmnew}; done &lt; &lt;( find /etc -iname '*.rpmnew' )
+        </command>
+
         <command name="networking-fix">
-rm -fr /etc/sysconfig/networking
-rm -f /etc/udev/rules.d/70-persistent-net.rules
-rm -f /etc/hostname
+            rm -fr /etc/sysconfig/networking
+            rm -f /etc/udev/rules.d/70-persistent-net.rules
+            rm -f /etc/hostname
         </command>
 
         <command name='ntp-fix'>
-sed -ri '/^server [1-3]\.fedora.*$/d' /etc/ntp.conf
-sed -ri 's@^server 0\.fedora.*$@server metadata.google.internal iburst@' /etc/ntp.conf
+            sed -ri '/^server [1-3]\.fedora.*$/d' /etc/ntp.conf
+            sed -ri 's@^server 0\.fedora.*$@server metadata.google.internal iburst@' /etc/ntp.conf
         </command>
 
         <command name='firewall-fix'>
-systemctl disable firewalld.service iptables.service
-systemctl stop firewalld.service iptables.service
+            systemctl disable firewalld.service iptables.service
         </command>
 
         <command name='yum-auto-updates'>
-sed -ri 's@apply_updates = no@apply_updates = yes@' /etc/yum/yum-cron.conf        
+            sed -ri 's@apply_updates = no@apply_updates = yes@' /etc/yum/yum-cron.conf        
         </command>
 
-        <command name='ssh-fix'>
-## delete the keys
-rm /etc/ssh/ssh_host_key
-rm /etc/ssh/ssh_host_rsa_key*
-rm /etc/ssh/ssh_host_dsa_key*
-rm /etc/ssh/ssh_host_ecdsa_key*
+        <command name='ssh-remove_keys'>
+            for f in /etc/ssh/ssh_host_key /etc/ssh/ssh_host_rsa_key* /etc/ssh/ssh_host_dsa_key* /etc/ssh/ssh_host_ecdsa_key*; do
+                if [ -f $f ]; then
+                    rm $f
+                fi
+            done
 
-## patch sshd_config
-patch /etc/ssh/sshd_config < <( cat << 'EOF'
-18,19c18,19
-< #AddressFamily any
-< #ListenAddress 0.0.0.0
----
-> AddressFamily inet
-> ListenAddress 0.0.0.0
-48c48
-< #PermitRootLogin yes
----
-> PermitRootLogin without-password
-78c78
-< PasswordAuthentication yes
----
-> PasswordAuthentication yes
-114c114
-< #AllowTcpForwarding yes
----
-> AllowTcpForwarding no
-127c127
-< #ClientAliveInterval 0
----
-> ClientAliveInterval 420
-133c133
-< #PermitTunnel no
----
-> PermitTunnel no
-EOF
-)
+            patch /etc/ssh/sshd_config /google-ssh_fix.patch
 
-## lock root
-## not yet until google-daemon is in place
-# usermod -L root
+            ## lock root
+            ## not yet until google-daemon is in place
+            # usermod -L root
         </command>
 
         <command name='kernel-fix'>
-# kernel
-## remove symbol table
-rm -f /boot/System.map*
+            for f in /boot/System.map*; do
+                rm -f $f
+            done
         </command>
     </commands>
 </template>
