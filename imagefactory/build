@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-sudo oz-install -d3 -t 10000 -x f20.xml f20.tdl
-sudo oz-customize -d3 f20.tdl f20.xml
+if (( $( id -u ) != 0 )); then
+    echo 'This script is intended bo ran as root...'
+    exit 1
+fi
+
+oz-install -d3 -t 10000 -x f20.xml f20.tdl
+oz-customize -d3 f20.tdl f20.xml
 
 exit 0
